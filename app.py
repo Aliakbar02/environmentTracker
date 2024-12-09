@@ -48,6 +48,13 @@ def solve_complaint(complaint_id):
     db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/all_reports.html')
+def all_reports():
+    # Fetch all complaints from the database
+    complaints = Complaint.query.all()
+    return render_template('all_reports.html', complaints=complaints)
+
+
 if __name__ == '__main__':
     # Establish application context before creating the database tables
     with app.app_context():

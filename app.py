@@ -18,7 +18,9 @@ class Complaint(db.Model):
     reporter_name = db.Column(db.String(50), nullable=False)
     latitude = db.Column(db.Float, nullable=True)  # Latitude of the complaint location
     longitude = db.Column(db.Float, nullable=True) # Longitude of the complaint location
+    location = db.Column(db.String(200), nullable=True)  # Location added to the model
     is_solved = db.Column(db.Boolean, default=False)
+
 
 
 # Routes
@@ -33,15 +35,25 @@ def add_complaint():
         title = request.form['title']
         description = request.form['description']
         reporter_name = request.form['reporter_name']
-        location = request.form.get('location')
+        location = request.form.get('location')  # Get the location
 
-        new_complaint = Complaint(title=title, description=description, reporter_name=reporter_name)
+        # Latitude and longitude are also being captured
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+
+        new_complaint = Complaint(
+            title=title, 
+            description=description, 
+            reporter_name=reporter_name, 
+            location=location,  # Save the location
+            latitude=latitude,
+            longitude=longitude
+        )
         db.session.add(new_complaint)
         db.session.commit()
 
         return redirect(url_for('index'))
     return render_template('add_complaint.html')
-
 @app.route('/solve/<int:complaint_id>')
 def solve_complaint(complaint_id):
     complaint = Complaint.query.get_or_404(complaint_id)

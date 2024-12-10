@@ -267,13 +267,68 @@
     <div class="top-half">
         <div class="container">
             <h1>Report, View, or Discuss Local Problems</h1>
-            <div class="text-center">
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Enter a nearby postcode, or street name and area">
-                    <button class="btn btn-primary">Go</button>
+            <div class="top-half">
+                <div class="container">
+
+                    <div class="text-center">
+                        <div class="input-group mb-3">
+                            <input type="text" id="addressInput" class="form-control" placeholder="Enter a nearby postcode, or street name and area">
+                            <button class="btn btn-primary" id="goButton">Go</button>
+                        </div>
+                    </div>
+            
+                    <!-- Map Container -->
+                    <div id="map" class="map-container"></div>
                 </div>
-                
             </div>
+            
+            <script>
+                // Initialize the map
+                var map = L.map('map').setView([20.5937, 78.9629], 5); // Default view of India
+            
+                // Add OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+            
+                var marker; // Marker variable
+            
+                // Handle "Go" button click
+                document.getElementById('goButton').addEventListener('click', function () {
+                    var address = document.getElementById('addressInput').value; // Get the address input
+            
+                    if (address) {
+                        // Call the Nominatim API
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.length > 0) {
+                                    var lat = data[0].lat;
+                                    var lon = data[0].lon;
+            
+                                    // Update the map view
+                                    map.setView([lat, lon], 13);
+            
+                                    // Add or move the marker
+                                    if (marker) {
+                                        marker.setLatLng([lat, lon]);
+                                    } else {
+                                        marker = L.marker([lat, lon]).addTo(map);
+                                    }
+                                } else {
+                                    alert('Location not found. Please try again with a different input.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching location:', error);
+                                alert('An error occurred while fetching the location. Please try again.');
+                            });
+                    } else {
+                        alert('Please enter a pincode or address.');
+                    }
+                });
+            </script>
+            
 
             <!-- Attractive Steps for Reporting Issue -->
             <div class="report-steps">

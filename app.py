@@ -33,6 +33,7 @@ def add_complaint():
         title = request.form['title']
         description = request.form['description']
         reporter_name = request.form['reporter_name']
+        location = request.form.get('location')
 
         new_complaint = Complaint(title=title, description=description, reporter_name=reporter_name)
         db.session.add(new_complaint)
@@ -52,6 +53,7 @@ def solve_complaint(complaint_id):
 def all_reports():
     # Fetch all complaints from the database
     complaints = Complaint.query.all()
+    complaints = db.session.query(Complaint).all()
     return render_template('all_reports.html', complaints=complaints)
 
 
